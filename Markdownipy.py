@@ -311,9 +311,9 @@ class Markdownipy(object):
         el = lxml.html.fromstring(html_str, parser=psr)
 
         for node in el.iter():
-            parent = node.getparent()
             # Remove whitespace surrounding any block level elements
             if node.tag in Markdownipy.block_level:
+                parent = node.getparent()
                 left_sib = node.getprevious()
                 # Remove whitespace to the left
                 if left_sib:
@@ -327,11 +327,11 @@ class Markdownipy(object):
                 if node.tail:
                     node.tail = node.tail.lstrip()
 
-            # Remove newlines inside of blocklevels, except for pre and blockquote
-            if node.tag in Markdownipy.block_level - {'blockquote','pre'} and node.text:
-                node.text = ' '.join(node.text.split('\n'))
-            if parent and parent.tag in Markdownipy.block_level - {'blockquote','pre'} and node.tail:
-                node.tail = ' '.join(node.tail.split('\n'))
+                # Remove newlines inside of blocklevels, except for pre and blockquote
+                if node.tag in Markdownipy.block_level - {'blockquote','pre'} and node.text:
+                    node.text = ' '.join(node.text.split('\n'))
+                if parent and parent.tag in Markdownipy.block_level - {'blockquote','pre'} and node.tail:
+                    node.tail = ' '.join(node.tail.split('\n'))
                 
 
         # For debugging, its helpful to save the string we are about to translate
