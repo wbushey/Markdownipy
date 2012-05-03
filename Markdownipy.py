@@ -9,7 +9,7 @@ class Markdownipy(object):
 
     # Define which elements are block level, cause they're special
     # Maybe poor name - this set refers to HTML elements that will cause newlines in MD.
-    block_level = {'blockquote','br','dd','div','dl','h1','h2','h3','h4','h5','h6','li','ol','p','pre','td','ul'}
+    block_level = {'blockquote','br','dd','div','dl','h1','h2','h3','h4','h5','h6','hr','li','ol','p','pre','td','ul'}
 
     # Build the dictionary of element translators
 
@@ -97,6 +97,12 @@ class Markdownipy(object):
     translator['i'] = lambda self,el : "*" + re.sub(r'\n{2,}', '*\n\n' + self.indent_list(False) + '*', el.text_content().strip()) + "*"
     translator['em'] = translator['i']
 
+    # ------Code------
+    # MD has different styles for inline code and a block of code. 
+
+    # ------Horizontal Rules------
+    translator['hr'] = lambda self, el: "------------\n\n"
+
     # ------<u>------
     # MD doesn't do underlines, so just return the text
     #translator['u'] = lambda self,el : el.text_content()
@@ -106,9 +112,6 @@ class Markdownipy(object):
 
     # ------Headings------
     def pre_heading(self,el):
-        # Headers should not have newlines in them
-        # el.text = el.text.replace('\n', ' ')
-
         # Special case of a heading being the first content of an li.
         parent = el.getparent()
         left_sib = el.getprevious()
@@ -126,11 +129,15 @@ class Markdownipy(object):
 
     # ------Preformated------
     # Probably need to add more to the <pre> function
-    translator['pre'] = lambda self,el : "\n" + self.indent_list(False) + el.text_content().replace("\n", " ") + "\n\n"
+    def translate_pre(self,el):
+        rtn_str = ""
+        for line in el.text_content().strip().split("\n"):
+            rtn_str += "    " + line + "\n"
+        return rtn_str + "\n"
+    translator['pre'] = translate_pre
 
     # ------Blockquotes------
     def translate_blockquote(self,el):
-        parent = el.getparent()
         rtn_str = ""
         for line in el.text_content().strip().split("\n"):
             rtn_str += self.indent_list(False) + "> " + line.strip() + "\n"
