@@ -312,7 +312,7 @@ class Markdownipy(object):
 
         if len(html_str.strip()) == 0: return ''
 
-        # Escape Markdown characters and remove some tags
+        # Escape Markdown characters and remove some tags without removing their content
         html_str = html_str.replace('[','\[').replace(']','\]')
         c = Cleaner(forms=False, annoying_tags=False, remove_tags=['u'])
         html_str = c.clean_html(html_str)
@@ -323,6 +323,9 @@ class Markdownipy(object):
         el = lxml.html.fromstring(html_str, parser=psr)
 
         for node in el.iter():
+            # Remove style tags
+            if node.tag == 'style':
+                node.drop_tree()
             # Remove whitespace surrounding any block level elements
             if node.tag in Markdownipy.block_level:
                 parent = node.getparent()
