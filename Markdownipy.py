@@ -199,7 +199,9 @@ class Markdownipy(object):
 
         # For certain tags, skip translation entirely
         if el.tag in {'table'}:
-            return lxml.etree.tostring(el, encoding=unicode, method='html')
+            raw = lxml.etree.tostring(el, encoding=unicode, method='html')
+            el.clear()
+            return raw
 
         # Translate depth first
         i = 1   # Used to numerate ols
