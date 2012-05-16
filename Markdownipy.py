@@ -11,6 +11,78 @@ class Markdownipy(object):
     # Maybe poor name - this set refers to HTML elements that will cause newlines in MD.
     block_level = {'blockquote','br','dd','div','dl','dt','h1','h2','h3','h4','h5','h6','hr','li','ol','p','pre','td','ul'}
 
+    # Returns true if the content of the provided element is the leading content of a line
+    # This function runs on HTML elements before any translation occurs
+    # Here 'content' refers to non-whiespace characters
+    def is_first_in_line_html(self, el):
+        # This element contains no content, so it can't be the leading content of a line.
+        if el.text is None or el.text.strip() == '': return False
+
+        # This element has content and is a block level, so its content is the leading content of a line.
+        if el.tag in Markdownipy.block_level: return True
+
+        # This element has content, is not a block level, and is the body element. Definitely leading content of a line.
+        if el.tag == 'body': return True
+
+        # Final case - is there content between the present element and the nearest block level element to the left of the present
+        # element.    
+
+        def traverse_children(element, bound_text):
+            children = element.iterchildren(reversed=True)
+            for child in children:
+                bound_text = child.tail + bound_text
+                if len(bound_text) > 0: return False
+                if child in Markdownipy.block_level: return bound_text.strip() == ''
+                rst_children = traverse_children(child, bound_text)
+                if rst_children is not None: return rst_children
+                bound_text = child.text + bound_text
+                if len(bound_text) > 0: return False
+            return None
+
+        def traverse_left_sibs_and_ancestors(element, bound_text):
+            left_sibs = element.itersiblings(preceding=True)
+            for sib in left_sibs:
+                bound_text = sib.tail + bound_text
+                if len(bound_text.strip()) > 0: return False
+                if sib.tag in Markdownipy.block_level: return bound_text.strip() == ''
+                rst_children = traverse_children(sib, bound_text)
+                if rst_children is not None: return rst_children
+                bound_text = sib.text + bound_text
+                if len(bound_text.strip()) > 0: return False 
+            parent = element.getparent()
+            bound_text = parent.tail + bound_text
+            if parent.tag == 'body': return bound_text.strip() == ''
+            if parent.tag in Markdownipy.block_level: return bound_text.strip() == ''
+            return traverse_left_sibs_and_ancestors(parent)
+
+        return traverse_left_sibs_and_ancestors(el, '')
+
+        #nearest_bl = traverse_left_sibs_and_ancestors(el)
+        # There are no block levels between the document's beginning and the present element. Compare the present element to all content.
+        #print "nearest_bl is None: " + `nearest_bl is None`
+        #root = el.getroottree()
+        #root_text = root.getroot().text_content()
+        #if nearest_bl is None:
+        #    return root_text.strip().startswith(el.text.strip())
+
+        # Otherwise, see if the content of the document following the nearest block level begins with the content of the present element.
+        #nearest_bl_content = nearest_bl.text_content()
+        #print "Nearest_bl_content:"
+        #print nearest_bl_content
+        #print ""
+        #print ""
+        #index = root_text.find(nearest_bl_content)
+        #if index == -1: raise ValueError("Text of nearest block level element could not be found in document")
+        #print "stripped root text at index + len(nearest_bl_content):"
+        #print root_text[index + len(nearest_bl_content):].strip()
+        #print ""
+        #print ""
+        #print "stripped element text:"
+        #print el.text.strip()
+        #return root_text[index + len(nearest_bl_content):].strip().startswith(el.text.strip())
+            
+
+
     # Build the dictionary of element translators
 
     # ------Lists------

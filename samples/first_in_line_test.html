@@ -1,0 +1,25 @@
+<html>
+<body>
+root
+<!-- A span that does not have its own content, but does have several levels of children-->
+<span>
+  <a>
+    <b>
+      <h1>
+        A block level that is the decendant of several non block levels
+      </h1>
+    </b>
+  </a>
+  <span>
+    A non-block level that has no block levels among its ancestors, but a block level element among its left cousins
+  </span>
+</span>
+<div>
+block level
+</div>
+<div>
+<span>first content in a non block level in a block level</span>
+<span>following content in a non block level in a block level</span>
+</div>
+</body>
+</html>
