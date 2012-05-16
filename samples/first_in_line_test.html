@@ -13,13 +13,19 @@ root
   <span>
     A non-block level that has no block levels among its ancestors, but a block level element among its left cousins
   </span>
+  <span>
+    A non-block level that has no block levels among its ancestors, and content between itself and its nearest left-cousin block level
+  </span>
 </span>
 <div>
-block level
+a block level
 </div>
 <div>
 <span>first content in a non block level in a block level</span>
 <span>following content in a non block level in a block level</span>
+</div>
+<div>
+  <i>  </i><b>a non block level that contains the first content within a block leve, but follows an empty non-block level</b>
 </div>
 </body>
 </html>

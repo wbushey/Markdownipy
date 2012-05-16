@@ -32,20 +32,39 @@ class TestMarkdownipy(unittest.TestCase):
         self.assertEqual(self.t.is_first_in_line_html(el), True, err_msg)
         print "OK"
 
+        print "\tTesting a span that is not the first content containing element of a div...",
+        el = self.sample_dom.xpath('/html/body/div[2]/span[2]')[0]
+        err_msg = 'Error testing a span which is not the first content inside of a div'
+        self.assertEqual(self.t.is_first_in_line_html(el), False, err_msg)
+        print "OK"
+
         print "\tTesting a div that does not contain text of its own...",
         el = self.sample_dom.xpath('/html/body/div[2]')[0]
         err_msg = 'Error testing a div that contains elements, but does not have content of its own.'
         self.assertEqual(self.t.is_first_in_line_html(el), False, err_msg)
         print "OK"
 
+        print "\tTesting a non-block level that contains the first content of a block level and has an empty non-block level to its left...",
+        el = self.sample_dom.xpath('/html/body/div[3]/b')[0]
+        err_msg = 'Error testing a non-block level that contains the first content of a block level nad has an empty non-block level to its left.'
+        self.assertEqual(self.t.is_first_in_line_html(el), True, err_msg)
+        print "OK"
+
         print "\tTesting a span which contains the first content following a block level among its left cousins...",
-        el = self.sample_dom.xpath('/html/body/span[1]/span')[0]
+        el = self.sample_dom.xpath('/html/body/span[1]/span[1]')[0]
         err_msg = 'Error testing a span which contains the first content following a block level among its left cousins'
         self.assertEqual(self.t.is_first_in_line_html(el), True, err_msg)
+        print "OK"
+
+        print "\tTesting a span which contains content and has content between itself and its nearest block level...",
+        el = self.sample_dom.xpath('/html/body/span[1]/span[2]')[0]
+        err_msg = 'Error testing a span which contains content and has content between itself and its nearest block level'
+        self.assertEqual(self.t.is_first_in_line_html(el), False, err_msg)
         print "OK"
         
     def tearDown(self):
         pass
+
     def test_a_translator(self):
         print "Testing 'a' translator...",
         el = fromstring('<a href="http://www.friendlytos.org">Friendly ToS</a>')

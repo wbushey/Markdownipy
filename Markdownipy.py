@@ -30,27 +30,27 @@ class Markdownipy(object):
         def traverse_children(element, bound_text):
             children = element.iterchildren(reversed=True)
             for child in children:
-                bound_text = child.tail + bound_text
-                if len(bound_text) > 0: return False
-                if child in Markdownipy.block_level: return bound_text.strip() == ''
+                if child.tail is not None: bound_text = child.tail + bound_text
+                if bound_text.strip() != '': return False
+                if child.tag in Markdownipy.block_level: return bound_text.strip() == ''
                 rst_children = traverse_children(child, bound_text)
                 if rst_children is not None: return rst_children
-                bound_text = child.text + bound_text
-                if len(bound_text) > 0: return False
+                if child.text is not None: bound_text = child.text + bound_text
+                if bound_text.strip() != '': return False
             return None
 
         def traverse_left_sibs_and_ancestors(element, bound_text):
             left_sibs = element.itersiblings(preceding=True)
             for sib in left_sibs:
-                bound_text = sib.tail + bound_text
-                if len(bound_text.strip()) > 0: return False
+                if sib.tail is not None: bound_text = sib.tail + bound_text
+                if bound_text.strip() != '': return False
                 if sib.tag in Markdownipy.block_level: return bound_text.strip() == ''
                 rst_children = traverse_children(sib, bound_text)
                 if rst_children is not None: return rst_children
-                bound_text = sib.text + bound_text
-                if len(bound_text.strip()) > 0: return False 
+                if sib.text is not None: bound_text = sib.text + bound_text
+                if bound_text.strip() != '': return False 
             parent = element.getparent()
-            bound_text = parent.tail + bound_text
+            if parent.tail is not None: bound_text = parent.tail + bound_text
             if parent.tag == 'body': return bound_text.strip() == ''
             if parent.tag in Markdownipy.block_level: return bound_text.strip() == ''
             return traverse_left_sibs_and_ancestors(parent)
