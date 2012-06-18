@@ -107,7 +107,7 @@ class Markdownipy(object):
         if el.getparent() is not None and el.getparent().tag == 'li':
             return "\n" + el.text_content()
         else:
-            return "\n\n" + el.text_content() + "\n\n"
+            return "\n\n" + el.text_content() + "\n"
 
     translator['ul'] = translate_ul
     translator['ol'] = translator['ul']
@@ -232,7 +232,7 @@ class Markdownipy(object):
         rtn_str = ""
         for line in el.text_content().strip().split("\n"):
             rtn_str += self.indent_list(False) + "> " + line.strip() + "\n"
-        return rtn_str + "\n\n"
+        return rtn_str
     translator['blockquote'] = translate_blockquote
 
     # ------Tables------

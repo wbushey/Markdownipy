@@ -5,7 +5,7 @@ import unittest
 # Tests
 class TestMarkdownipy(unittest.TestCase):
     def setUp(self):
-        self.t = Markdownipy(True,False)
+        self.t = Markdownipy(True,True)
         f = open('samples/first_in_line_test.html','r')
         self.sample = f.read()
         self.sample_dom = fromstring(self.sample)
@@ -73,6 +73,16 @@ class TestMarkdownipy(unittest.TestCase):
         err_msg = 'Links are not translating correctly\n'\
                     'Expected:\n' + correct_response + '\n---\n'\
                     'Recieved:\n' + response + "\n---"
+        self.assertEqual(response, correct_response, err_msg)
+        print "OK"
+    def test_blockquote_translator(self):
+        print "Testing 'blockquote' translator...",
+        el = fromstring('<blockquote>Hi, this is\na quoted paragraph\nof many lines</blockquote>')
+        correct_response = '> Hi, this is\n> a quoted paragraph\n> of many lines\n'
+        response = self.t.translate(el)
+        err_msg = 'Blockquotes are not translating correctly\n'\
+                    'Expected:\n' + correct_response + '\n---\n'\
+                    'Recieved:\n' + response + '\n---'
         self.assertEqual(response, correct_response, err_msg)
         print "OK"
     def test_b_translator(self):
@@ -158,6 +168,16 @@ class TestMarkdownipy(unittest.TestCase):
                     'Recieved:\n' + response + "\n---"
         self.assertEqual(response, correct_response, err_msg)
         print "OK"
+    def test_ol_translator(self):
+        print "Testing 'ol' translator...",
+        el = fromstring('<ol><li>Item 1</li>\n<li>Item 2</li><li>And another item</li></ol>')
+        correct_response = '\n\n1. Item 1\n2. Item 2\n3. And another item\n\n'
+        response = self.t.translate(el)
+        err_msg = 'Ordered lists are not translating correctly\n'\
+                    'Expected:\n' + correct_response + '\n---\n'\
+                    'Recieved:\n' + response + '\n---'
+        self.assertEqual(response, correct_response, err_msg)
+        print "OK"
     def test_p_translator(self):
         print "Testing 'p' translator...",
         el = fromstring('<p>Text!</p>')
@@ -200,9 +220,9 @@ class TestMarkdownipy(unittest.TestCase):
         print "OK"
 
     def test_ul_translator(self):
-        print "Testing 'ul' translator",
+        print "Testing 'ul' translator...",
         el = fromstring('<ul><li>This is</li>\n<li>a list</li><li>of elements</li></ul>')
-        correct_response = '\n\n* This is\n* a list\n* of elements\n\n\n'
+        correct_response = '\n\n* This is\n* a list\n* of elements\n\n'
         response = self.t.translate(el)
         err_msg = 'Unordered lists are not translating correctly\n'\
                     'Expected:\n' + correct_response + '\n---\n'\
